@@ -1,5 +1,19 @@
 ---
 - hosts: all
+  sudo: yes
   tasks:
-    - name: test
-      command: whoami
+    - name: download node ppa
+      get_url: url=https://deb.nodesource.com/setup dest=/tmp/node-ppa
+
+    - name: add node ppa
+      command: bash /tmp/node-ppa creates=/etc/apt/sources.list.d/nodesource.list
+
+    - name: install dependencies
+      apt: name={{ item }} update_cache=yes
+      with_items:
+        - zip
+        - wget
+        - nodejs
+
+    - name: upgrade npm
+      npm: name=npm version=2.5.0 global=yes
