@@ -17,3 +17,21 @@
 
     - name: upgrade npm
       npm: name=npm version=2.5.0 global=yes
+
+    - name: create www
+      file: path=/var/www state=directory
+
+    - name: download ghost
+      get_url: url=https://ghost.org/zip/ghost-latest.zip dest=/var/www/ghost-latest.zip
+
+    - name: extract ghost
+      command: unzip -d ghost ghost-latest.zip creates=ghost chdir=/var/www
+
+    - name: install npm dependencies
+      npm: path=/var/www/ghost production=yes
+
+    - name: copy config
+      command: cp config.example.js config.js chdir=/var/www/ghost creates=config.js
+
+    - name: replace 127.0.0.1
+      replace: dest=/var/www/ghost/config.js regexp='127.0.0.1' replace='0.0.0.0'
